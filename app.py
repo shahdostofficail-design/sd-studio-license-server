@@ -23,14 +23,12 @@ from flask import (
 app = Flask(__name__)
 app.secret_key = os.environ.get("FLASK_SECRET", "CHANGE-ME-IN-PRODUCTION-USE-RANDOM-STRING")
 
-# ── Database Mode Detection ───────────────────────────────────────────────────
-# Railway PostgreSQL sets DATABASE_URL automatically when you add the addon.
-# Falls back to SQLite for local development.
-_DATABASE_URL = os.environ.get("DATABASE_URL", "")
-_USE_PG = bool(_DATABASE_URL)
+# ── Database: SQLite only (stored on Railway volume) ──────────────────────────
+# Postgres removed — SQLite on /data volume is simpler and always available.
+_USE_PG = False
+_DATABASE_URL = ""
 
-# SQLite fallback path (local dev only)
-_DB_DIR = os.environ.get("DB_DIR", str(Path(__file__).parent))
+_DB_DIR = os.environ.get("DB_DIR", "/data")
 _DB_PATH = Path(_DB_DIR) / "licenses.db"
 
 # Admin password
