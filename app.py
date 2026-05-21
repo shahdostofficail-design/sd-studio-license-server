@@ -23,12 +23,11 @@ from flask import (
 app = Flask(__name__)
 app.secret_key = os.environ.get("FLASK_SECRET", "CHANGE-ME-IN-PRODUCTION-USE-RANDOM-STRING")
 
-# ── Database: SQLite only (stored on Railway volume) ──────────────────────────
-# Postgres removed — SQLite on /data volume is simpler and always available.
-_USE_PG = False
-_DATABASE_URL = ""
+# ── Database Mode Detection ───────────────────────────────────────────────────
+_DATABASE_URL = os.environ.get("DATABASE_URL", "")
+_USE_PG = bool(_DATABASE_URL)
 
-_DB_DIR = os.environ.get("DB_DIR", "/data")
+_DB_DIR = os.environ.get("DB_DIR", str(Path(__file__).parent))
 _DB_PATH = Path(_DB_DIR) / "licenses.db"
 
 # Admin password
