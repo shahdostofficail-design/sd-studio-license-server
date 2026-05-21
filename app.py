@@ -295,11 +295,15 @@ def api_validate():
     if not key:
         return {"ok": False, "reason": "no_key"}, 400
 
+<<<<<<< HEAD
     try:
         get_db()
     except Exception as _e:
         print(f"[ERROR] DB connection failed: {_e}")
         return {"ok": False, "reason": "offline"}, 503
+=======
+    get_db()
+>>>>>>> 917c00f508df9c50183115ecc0e17e95964c8cdf
     row = db_execute_one("SELECT * FROM licenses WHERE key=?", (key,))
 
     if not row:
@@ -324,7 +328,10 @@ def api_validate():
             activation_count   = activation_count + 1
         WHERE id = ?
     """, (device_fp, device_name, username, client_ip, row["id"]))
+<<<<<<< HEAD
     # Note: db_write() auto-converts datetime('now') → NOW() for PostgreSQL
+=======
+>>>>>>> 917c00f508df9c50183115ecc0e17e95964c8cdf
     db_commit()
 
     return {

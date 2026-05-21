@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SD Studio — License Dashboard</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #0a0a0a;
+    color: #e4e4e7;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-size: 14px;
+    min-height: 100vh;
+  }
+  /* ── Header ── */
+  .topbar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 32px;
+    height: 60px;
+    background: #111;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    position: sticky; top: 0; z-index: 100;
+  }
+  .topbar-left { display: flex; align-items: center; gap: 12px; }
+  .logo-mark {
+    width: 36px; height: 36px;
+    background: linear-gradient(135deg, #e11d48, #9f1239);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 900; color: #fff;
+  }
+  .topbar h1 { font-size: 17px; font-weight: 700; color: #fafafa; }
+  .topbar-right { display: flex; align-items: center; gap: 16px; }
+  .month-badge {
+    font-size: 11px; color: #71717a;
+    background: #1a1a1a; border: 1px solid rgba(255,255,255,0.07);
+    padding: 4px 10px; border-radius: 20px;
+  }
+  .logout-btn {
+    font-size: 12px; color: #71717a;
+    text-decoration: none; padding: 6px 12px;
+    border: 1px solid rgba(255,255,255,0.08); border-radius: 6px;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  .logout-btn:hover { color: #fca5a5; border-color: rgba(225,29,72,0.4); }
+
+  /* ── New Key Banner ── */
+  .key-banner {
+    margin: 24px 32px 0;
+    background: rgba(34,197,94,0.1);
+    border: 1px solid rgba(34,197,94,0.35);
+    border-radius: 10px;
+    padding: 16px 20px;
+    display: flex; align-items: center; gap: 16px;
+  }
+  .key-banner .kblabel { font-size: 11px; color: #86efac; letter-spacing: 0.5px; font-weight: 600; }
+  .key-banner .kbclient { font-size: 13px; color: #d1fae5; font-weight: 700; }
+  .key-banner .kbkey {
+    font-family: "Consolas", monospace;
+    font-size: 20px; font-weight: 800;
+    color: #4ade80;
+    letter-spacing: 3px;
+    background: rgba(0,0,0,0.3); padding: 8px 16px; border-radius: 6px;
+    border: 1px solid rgba(34,197,94,0.3);
+    user-select: all;
+  }
+  .key-banner .kbhint { font-size: 11px; color: #86efac; margin-top: 4px; }
+
+  /* ── Main Layout ── */
+  .main { padding: 24px 32px; }
+  .section-title {
+    font-size: 11px; font-weight: 700; color: #52525b;
+    text-transform: uppercase; letter-spacing: 1.5px;
+    margin-bottom: 14px;
+  }
+
+  /* ── Create Form ── */
+  .create-card {
+    background: #141414;
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 12px;
+    padding: 20px 24px;
+    display: flex; align-items: flex-end; gap: 16px;
+    margin-bottom: 32px;
+    flex-wrap: wrap;
+  }
+  .form-group { display: flex; flex-direction: column; gap: 6px; }
+  .form-group label { font-size: 11px; font-weight: 600; color: #71717a; letter-spacing: 0.5px; }
+  .form-group input {
+    background: #0d0d0d;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 7px;
+    padding: 9px 13px;
+    color: #fafafa;
+    font-size: 13px;
+    outline: none;
+    min-width: 180px;
+    transition: border-color 0.15s;
+  }
+  .form-group input:focus { border-color: #e11d48; }
+  .btn-create {
+    background: linear-gradient(135deg, #e11d48, #9f1239);
+    color: #fff; border: none; border-radius: 7px;
+    padding: 10px 20px; font-size: 13px; font-weight: 700;
+    cursor: pointer; white-space: nowrap; transition: opacity 0.15s;
+  }
+  .btn-create:hover { opacity: 0.85; }
+
+  /* ── Flash Error ── */
+  .flash-error {
+    background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3);
+    color: #fca5a5; border-radius: 8px; padding: 10px 14px;
+    font-size: 13px; margin-bottom: 16px;
+  }
+
+  /* ── Stats Row ── */
+  .stats { display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }
+  .stat-card {
+    background: #141414; border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 10px; padding: 16px 20px; flex: 1; min-width: 120px;
+  }
+  .stat-card .sval { font-size: 28px; font-weight: 800; color: #fafafa; }
+  .stat-card .slbl { font-size: 11px; color: #52525b; margin-top: 4px; }
+  .stat-card.red .sval { color: #fb7185; }
+  .stat-card.green .sval { color: #4ade80; }
+  .stat-card.yellow .sval { color: #fbbf24; }
+
+  /* ── Table ── */
+  .table-wrap {
+    background: #141414; border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 12px; overflow: hidden;
+  }
+  table { width: 100%; border-collapse: collapse; }
+  thead th {
+    padding: 12px 16px;
+    font-size: 11px; font-weight: 700; color: #52525b;
+    text-transform: uppercase; letter-spacing: 1px;
+    text-align: left;
+    background: #111;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  tbody tr { border-bottom: 1px solid rgba(255,255,255,0.04); transition: background 0.1s; }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: rgba(255,255,255,0.02); }
+  td { padding: 13px 16px; vertical-align: middle; }
+
+  .td-key {
+    font-family: "Consolas", monospace;
+    font-size: 13px; font-weight: 700;
+    color: #a1a1aa; letter-spacing: 2px;
+  }
+  .td-client { font-weight: 600; color: #fafafa; }
+  .td-device { font-size: 12px; color: #71717a; max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+  /* Status badges */
+  .badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 700;
+    letter-spacing: 0.5px; white-space: nowrap;
+  }
+  .badge-active { background: rgba(34,197,94,0.15); color: #4ade80; border: 1px solid rgba(34,197,94,0.3); }
+  .badge-blocked { background: rgba(239,68,68,0.15); color: #f87171; border: 1px solid rgba(239,68,68,0.3); }
+  .badge-expired { background: rgba(161,161,170,0.12); color: #71717a; border: 1px solid rgba(161,161,170,0.2); }
+  .badge::before { content: "●"; font-size: 8px; }
+
+  /* Action buttons */
+  .actions { display: flex; gap: 6px; flex-wrap: wrap; }
+  .btn-sm {
+    padding: 5px 11px; border-radius: 6px; font-size: 11px;
+    font-weight: 700; border: none; cursor: pointer; white-space: nowrap; transition: opacity 0.15s;
+  }
+  .btn-block { background: rgba(239,68,68,0.15); color: #f87171; border: 1px solid rgba(239,68,68,0.3); }
+  .btn-block:hover { background: rgba(239,68,68,0.25); }
+  .btn-unblock { background: rgba(34,197,94,0.15); color: #4ade80; border: 1px solid rgba(34,197,94,0.3); }
+  .btn-unblock:hover { background: rgba(34,197,94,0.25); }
+  .btn-extend { background: rgba(251,191,36,0.15); color: #fbbf24; border: 1px solid rgba(251,191,36,0.3); }
+  .btn-extend:hover { background: rgba(251,191,36,0.25); }
+  .btn-delete { background: rgba(161,161,170,0.1); color: #71717a; border: 1px solid rgba(161,161,170,0.2); }
+  .btn-delete:hover { background: rgba(239,68,68,0.12); color: #f87171; border-color: rgba(239,68,68,0.3); }
+
+  .empty-row td { padding: 40px; text-align: center; color: #3f3f46; font-size: 13px; }
+
+  @media (max-width: 900px) {
+    .main, .topbar { padding-left: 16px; padding-right: 16px; }
+    .key-banner { margin-left: 16px; margin-right: 16px; flex-direction: column; align-items: flex-start; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── Top Bar ── -->
+<div class="topbar">
+  <div class="topbar-left">
+    <div class="logo-mark">SD</div>
+    <h1>License Dashboard</h1>
+  </div>
+  <div class="topbar-right">
+    <span class="month-badge">{{ now_month }}</span>
+    <a href="{{ url_for('admin_logout') }}" class="logout-btn">Sign Out</a>
+  </div>
+</div>
+
+<!-- ── New Key Banner ── -->
+{% if new_key %}
+<div class="key-banner">
+  <div>
+    <div class="kblabel">NEW LICENSE CREATED</div>
+    <div class="kbclient">{{ new_client }}</div>
+    <div class="kbhint">Copy this key and send to client — it won't be shown again</div>
+  </div>
+  <div class="kbkey">{{ new_key }}</div>
+</div>
+{% endif %}
+
+<div class="main">
+
+  <!-- ── Flash Errors ── -->
+  {% for msg in get_flashed_messages(category_filter=["error"]) %}
+  <div class="flash-error">{{ msg }}</div>
+  {% endfor %}
+
+  <!-- ── Stats ── -->
+  {% set total = licenses | length %}
+  {% set active = licenses | selectattr("is_blocked", "equalto", 0) | selectattr("expires_month", "ge", now_month) | list | length %}
+  {% set blocked = licenses | selectattr("is_blocked", "equalto", 1) | list | length %}
+  {% set expired = licenses | selectattr("is_blocked", "equalto", 0) | selectattr("expires_month", "lt", now_month) | list | length %}
+  <div class="stats">
+    <div class="stat-card"><div class="sval">{{ total }}</div><div class="slbl">Total Licenses</div></div>
+    <div class="stat-card green"><div class="sval">{{ active }}</div><div class="slbl">Active</div></div>
+    <div class="stat-card red"><div class="sval">{{ blocked }}</div><div class="slbl">Blocked</div></div>
+    <div class="stat-card yellow"><div class="sval">{{ expired }}</div><div class="slbl">Expired</div></div>
+  </div>
+
+  <!-- ── Create License ── -->
+  <div class="section-title">Create New License</div>
+  <div class="create-card">
+    <form method="post" action="{{ url_for('admin_create') }}" style="display:flex;gap:16px;align-items:flex-end;flex-wrap:wrap;">
+      <div class="form-group">
+        <label>Client Name</label>
+        <input type="text" name="client_name" placeholder="e.g. Ahmed — Studio" required>
+      </div>
+      <div class="form-group">
+        <label>Valid Until (Month)</label>
+        <input type="month" name="expires_month" value="{{ now_month }}" required>
+      </div>
+      <button type="submit" class="btn-create">Generate Key</button>
+    </form>
+  </div>
+
+  <!-- ── Licenses Table ── -->
+  <div class="section-title">All Licenses</div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Client</th>
+          <th>Key</th>
+          <th>Status</th>
+          <th>Expires</th>
+          <th>Device</th>
+          <th>Last Seen</th>
+          <th>Uses</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% if not licenses %}
+        <tr class="empty-row"><td colspan="9">No licenses yet. Create one above.</td></tr>
+        {% endif %}
+        {% for lic in licenses %}
+        {% set is_expired = lic.expires_month < now_month %}
+        <tr>
+          <td style="color:#3f3f46;font-size:12px;">{{ lic.id }}</td>
+          <td class="td-client">{{ lic.client_name }}</td>
+          <td class="td-key">{{ lic.key }}</td>
+          <td>
+            {% if lic.is_blocked %}
+              <span class="badge badge-blocked">Blocked</span>
+            {% elif is_expired %}
+              <span class="badge badge-expired">Expired</span>
+            {% else %}
+              <span class="badge badge-active">Active</span>
+            {% endif %}
+          </td>
+          <td style="color:{% if is_expired %}#71717a{% else %}#fafafa{% endif %};font-size:13px;">{{ lic.expires_month }}</td>
+          <td class="td-device" title="{{ lic.device_name }} / {{ lic.username }}">
+            {% if lic.device_name %}{{ lic.device_name }}{% else %}<span style="color:#3f3f46;">—</span>{% endif %}
+          </td>
+          <td style="font-size:12px;color:#71717a;">
+            {% if lic.last_seen %}{{ lic.last_seen[:16] }}{% else %}<span style="color:#3f3f46;">Never</span>{% endif %}
+          </td>
+          <td style="font-size:13px;color:#a1a1aa;">{{ lic.activation_count }}</td>
+          <td>
+            <div class="actions">
+              <form method="post" action="{{ url_for('admin_block', lic_id=lic.id) }}" style="display:inline;">
+                {% if lic.is_blocked %}
+                  <button class="btn-sm btn-unblock" type="submit">Unblock</button>
+                {% else %}
+                  <button class="btn-sm btn-block" type="submit" onclick="return confirm('Block {{ lic.client_name }}?')">Block</button>
+                {% endif %}
+              </form>
+              <form method="post" action="{{ url_for('admin_extend', lic_id=lic.id) }}" style="display:inline;">
+                <button class="btn-sm btn-extend" type="submit">+1 Month</button>
+              </form>
+              <form method="post" action="{{ url_for('admin_delete', lic_id=lic.id) }}" style="display:inline;">
+                <button class="btn-sm btn-delete" type="submit" onclick="return confirm('Delete license for {{ lic.client_name }}? This cannot be undone.')">Delete</button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+</div>
+</body>
+</html>
