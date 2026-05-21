@@ -43,7 +43,7 @@ ADMIN_PW_HASH = os.environ.get("ADMIN_PW_HASH", _DEFAULT_HASH)
 def _pg_conn():
     import psycopg2
     import psycopg2.extras
-    conn = psycopg2.connect(_DATABASE_URL)
+    conn = psycopg2.connect(_DATABASE_URL, connect_timeout=5)
     return conn
 
 
